@@ -1,0 +1,7 @@
+
+Todo:
+  ☐ Push to github @created(21-09-02 22:03) @critical 
+  ☐ Use redux @today 
+    ☐ Store global user uid, email @created(21-09-02 21:46) @high  
+    ☐ Firebase actions (signin, signout, save to firebase markdown text, each time you add a todo update the db) @created(21-09-02 21:46) @high 
+    ☐ Store in redux the current markdown text, to have it persist after refresh @created(21-09-02 21:47) @high 
