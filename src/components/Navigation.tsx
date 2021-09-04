@@ -14,7 +14,7 @@ export const Navigation = () => {
     <Wrapper>
       <nav>
         <div className="nav-container">
-          <h1>DEVLOG</h1>
+          <h1>DEVLOG v1.0.0</h1>
           <button
             className="button"
             type="submit"

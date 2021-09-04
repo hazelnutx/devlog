@@ -5,10 +5,13 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { FloppyDisk, ProjectorScreenChart } from "phosphor-react";
 
-import { auth } from "../utils/firebase";
+import { auth, firestore } from "../utils/firebase";
 import { useHistory } from "react-router";
 
+import { storeMarkdownData } from "../repository/firestore";
+
 import { Todo } from "../components/Todo";
+import { doc, getDoc, onSnapshot } from "@firebase/firestore";
 
 export const Dashboard = () => {
   const bodyRef = useRef<any>();
@@ -18,7 +21,20 @@ export const Dashboard = () => {
   const [isPreview, setIsPreview] = React.useState<boolean>(false);
   const [markdownBody, setMarkdownBody] = React.useState("");
 
+  const handleMarkdownSave = async (markdown: string) => {
+    await storeMarkdownData(markdown);
+  };
+
   React.useEffect(() => {
+    onSnapshot(
+      doc(firestore, "markdown", `${auth.currentUser?.uid}`),
+      (doc) => {
+        const data = doc.data();
+        setMarkdownBody(data?.body);
+        bodyRef.current = data?.body;
+      }
+    );
+
     auth.onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
@@ -35,7 +51,7 @@ export const Dashboard = () => {
         <div className="devlog-container">
           <div
             className="show-preview"
-            onClick={() => console.log("save to firebase")}
+            onClick={() => handleMarkdownSave(markdownBody)}
           >
             <FloppyDisk size={30} />
           </div>
@@ -48,6 +64,7 @@ export const Dashboard = () => {
           <textarea
             className="form-control"
             placeholder="Type something..."
+            value={markdownBody}
             ref={bodyRef}
             onChange={(e) => console.log(setMarkdownBody(e.target.value))}
           />

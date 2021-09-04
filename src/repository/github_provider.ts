@@ -3,7 +3,8 @@ import {
   GithubAuthProvider,
   setPersistence,
 } from "firebase/auth";
-import { auth } from "../utils/firebase";
+import { auth, firestore } from "../utils/firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 const provider = new GithubAuthProvider();
 
@@ -11,11 +12,23 @@ const provider = new GithubAuthProvider();
 
 export const signWithGithub = async () => {
   return signInWithPopup(auth, provider)
-    .then((result) => {
-      const credential = GithubAuthProvider.credentialFromResult(result);
+    .then(async (result) => {
+      const credential = await GithubAuthProvider.credentialFromResult(result);
       const token = credential?.accessToken;
 
       const user = result.user;
+
+      console.log(user);
+
+      await setDoc(
+        doc(firestore, "users", `${user.uid}`),
+        {
+          uid: user.uid,
+          email: user.email,
+          username: user.displayName,
+        },
+        { merge: true }
+      );
 
       return user;
     })
