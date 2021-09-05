@@ -1,6 +1,7 @@
 {
   "name": "devlog1.0",
   "version": "0.1.0",
+  "author": "Rusu Raul-Marius (github.com/hazelnutx)",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11",
