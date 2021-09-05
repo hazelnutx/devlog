@@ -1,8 +1,4 @@
-import {
-  signInWithPopup,
-  GithubAuthProvider,
-  setPersistence,
-} from "firebase/auth";
+import { signInWithPopup, GithubAuthProvider } from "firebase/auth";
 import { auth, firestore } from "../utils/firebase";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -17,8 +13,6 @@ export const signWithGithub = async () => {
       const token = credential?.accessToken;
 
       const user = result.user;
-
-      console.log(user);
 
       await setDoc(
         doc(firestore, "users", `${user.uid}`),
