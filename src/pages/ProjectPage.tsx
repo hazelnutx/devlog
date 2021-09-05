@@ -91,7 +91,7 @@ const ProjectPage = (props: RouteComponentProps<Props>) => {
           )}
         </div>
         <div className="todos-container">
-          <Todo />
+          <Todo projectId={projectId} />
         </div>
       </div>
     </Wrapper>

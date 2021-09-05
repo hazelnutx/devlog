@@ -16,7 +16,7 @@ export const TodoItem = (props: Props) => {
 };
 
 const Wrapper = styled.div`
-  margin: 0;
+  margin: 5px 0;
   .todo-container {
     display: flex;
     align-items: center;
@@ -32,7 +32,6 @@ const Wrapper = styled.div`
         outline: none;
       }
     }
-
     .todo-text {
       font-size: 18px;
       font-weight: 700;
