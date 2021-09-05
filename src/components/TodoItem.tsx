@@ -1,12 +1,15 @@
 import styled from "@emotion/styled";
 import React from "react";
 
-export const TodoItem = () => {
+interface Props {
+  todo_text: string;
+}
+export const TodoItem = (props: Props) => {
   return (
     <Wrapper>
       <div className="todo-container">
         <input type="checkbox" className="todo-checkbox" />
-        <p className="todo-text">asd</p>
+        <p className="todo-text">{props.todo_text}</p>
       </div>
     </Wrapper>
   );

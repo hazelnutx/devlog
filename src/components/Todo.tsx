@@ -7,7 +7,7 @@ export const Todo = () => {
     <Wrapper>
       <div className="todo-list_container">
         <p className="todo-list_title">Project Todo</p>
-        <TodoItem />
+        <TodoItem todo_text="a" />
       </div>
     </Wrapper>
   );
