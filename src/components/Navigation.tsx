@@ -3,6 +3,7 @@ import styled from "@emotion/styled";
 import { SignOut } from "phosphor-react";
 import { signOut } from "../repository/github_provider";
 import { useHistory } from "react-router";
+import { Link } from "react-router-dom";
 
 export const Navigation = () => {
   const history = useHistory();
@@ -14,18 +15,27 @@ export const Navigation = () => {
     <Wrapper>
       <nav>
         <div className="nav-container">
-          <h1>DEVLOG v1.0.0</h1>
-          <button
-            className="button"
-            type="submit"
-            onClick={logOut}
-            style={{ marginRight: 20 }}
+          <Link
+            to="/dashboard"
+            style={{
+              textDecoration: "none",
+            }}
           >
-            {/* TODO: Automated avatars from dicebear avatars */}
-          </button>
-          <button className="button" type="submit" onClick={logOut}>
-            <SignOut size={24} weight="duotone" />
-          </button>
+            <h1>DEVLOG v1.0.0</h1>
+          </Link>
+          <div style={{ display: "flex" }}>
+            <button
+              className="button"
+              type="submit"
+              onClick={logOut}
+              style={{ marginRight: 20 }}
+            >
+              {/* TODO: Automated avatars from dicebear avatars */}
+            </button>
+            <button className="button" type="submit" onClick={logOut}>
+              <SignOut size={24} weight="duotone" />
+            </button>
+          </div>
         </div>
       </nav>
     </Wrapper>
@@ -46,6 +56,7 @@ const Wrapper = styled.div`
       width: 100%;
       padding: 0 20px;
       display: flex;
+      justify-content: space-between;
       align-items: center;
 
       h1 {
