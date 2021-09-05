@@ -90,7 +90,7 @@ const ProjectPage = (props: RouteComponentProps<Props>) => {
             />
           )}
         </div>
-        <div className="todo-container">
+        <div className="todos-container">
           <Todo />
         </div>
       </div>
@@ -172,10 +172,14 @@ const Wrapper = styled.div<IStyle>`
         resize: none;
         font-family: Inconsolata;
         font-weight: 600;
+
+        :focus {
+          outline: none;
+        }
       }
     }
 
-    .todo-container {
+    .todos-container {
       grid-column-start: 9;
       grid-column-end: 12;
       height: 100%;
