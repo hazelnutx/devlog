@@ -32,6 +32,8 @@ const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
 
+    text-decoration: none;
+
     .title {
       font-size: 20px;
       font-weight: 600;
