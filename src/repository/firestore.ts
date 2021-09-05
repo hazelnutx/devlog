@@ -1,4 +1,10 @@
-import { doc, setDoc, FirestoreError } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  FirestoreError,
+  updateDoc,
+  arrayUnion,
+} from "firebase/firestore";
 import { auth, firestore } from "../utils/firebase";
 import { v4 as uuid } from "uuid";
 
@@ -35,6 +41,12 @@ export const createProject = (projectName: string) => {
             userId: user.uid,
             projectName: projectName,
           });
+          await setDoc(doc(firestore, "todos", `${uid}`), {
+            projectId: uid,
+            userId: user.uid,
+            projectName: projectName,
+            todos: [],
+          });
         } catch (error) {
           console.error("Create project thrown with " + error);
         }
@@ -44,4 +56,12 @@ export const createProject = (projectName: string) => {
     const errorName = FirestoreError.name;
     console.log(errorName);
   }
+};
+
+export const addTodo = async (todo: string, projectId: string) => {
+  const todoId = uuid();
+  const ref = doc(firestore, "todos", `${projectId}`);
+  await updateDoc(ref, {
+    todos: arrayUnion({ id: todoId, text: todo, completed: false }),
+  });
 };
