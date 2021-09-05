@@ -4,6 +4,11 @@ import {
   FirestoreError,
   updateDoc,
   arrayUnion,
+  query,
+  collection,
+  where,
+  getDoc,
+  getDocs,
 } from "firebase/firestore";
 import { auth, firestore } from "../utils/firebase";
 import { v4 as uuid } from "uuid";
@@ -65,3 +70,20 @@ export const addTodo = async (todo: string, projectId: string) => {
     todos: arrayUnion({ id: todoId, text: todo, completed: false }),
   });
 };
+
+// export const completeTodo = async (
+//   tid: string,
+//   projectId: string,
+//   complete: boolean
+// ) => {
+//   const todosRef = collection(firestore, "todos", `${projectId}`, "todos");
+//   const ref = query(todosRef, where("todoId", "==", tid));
+
+//   await setDoc(ref, {})
+
+//   // await updateDoc(ref, {
+//   //   todos: {
+//   //     complete: complete,
+//   //   },
+//   // });
+// };

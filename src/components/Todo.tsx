@@ -58,7 +58,12 @@ export const Todo = ({ projectId }: Props) => {
       <div className="todo-list_container">
         <p className="todo-list_title">Project Todo</p>
         {todosList?.map((todo) => (
-          <TodoItem todo_text={todo.text} key={todo.id} />
+          <TodoItem
+            todo_text={todo.text}
+            key={todo.id}
+            todo_id={todo.id}
+            projectId={projectId}
+          />
         ))}
         <input
           className="todo-input"
