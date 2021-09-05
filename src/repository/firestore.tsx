@@ -7,6 +7,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { auth, firestore } from "../utils/firebase";
+import { v4 as uuid } from "uuid";
 
 const user = auth.currentUser;
 
@@ -33,14 +34,25 @@ export const storeMarkdownData = async (markdown: any) => {
   }
 };
 
-// export const readMarkdownData = () => {
-//   const user = auth.currentUser;
+export const createProject = (projectName: string) => {
+  const uid = uuid();
 
-//   onSnapshot(
-//     doc(firestore, "markdown", `${user?.uid}`),
-//     (doc) => {
-//       const data = doc.data();
-//       return data?.body;
-//     }
-//   );
-// };
+  try {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          await setDoc(doc(firestore, "projects", `${uid}`), {
+            projectId: uid,
+            userId: user.uid,
+            projectName: projectName,
+          });
+        } catch (error) {
+          console.error("Create project thrown with " + error);
+        }
+      }
+    });
+  } catch (error) {
+    const errorName = FirestoreError.name;
+    console.log(errorName);
+  }
+};

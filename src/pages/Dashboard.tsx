@@ -1,43 +1,46 @@
-import React, { useRef } from "react";
+import React from "react";
 import styled from "@emotion/styled";
-import { Navigation } from "../components/Navigation";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { FloppyDisk, ProjectorScreenChart } from "phosphor-react";
-
 import { auth, firestore } from "../utils/firebase";
 import { useHistory } from "react-router";
 
-import { storeMarkdownData } from "../repository/firestore";
+import { onSnapshot, collection, query, where } from "@firebase/firestore";
+import { Plus } from "phosphor-react";
 
-import { Todo } from "../components/Todo";
-import { doc, getDoc, onSnapshot } from "@firebase/firestore";
+import { createProject } from "../repository/firestore";
+
+import { Navigation } from "../components/Navigation";
+import { ProjectCard } from "../components/ProjectCard";
+import { User } from "@firebase/auth";
 
 export const Dashboard = () => {
-  const bodyRef = useRef<any>();
   const history = useHistory();
 
   const [user, setUser] = React.useState<any>();
-  const [isPreview, setIsPreview] = React.useState<boolean>(false);
-  const [markdownBody, setMarkdownBody] = React.useState("");
+  const [projectName, setProjectName] = React.useState<string>("");
+  const [projects, setProjects] = React.useState<any[]>([]);
 
-  const handleMarkdownSave = async (markdown: string) => {
-    await storeMarkdownData(markdown);
+  const getProjects = async (user: User) => {
+    const q = query(
+      collection(firestore, "projects"),
+      where("userId", "==", user.uid)
+    );
+
+    onSnapshot(q, (snapshot) => {
+      const items: any[] = [];
+
+      snapshot.docs.forEach((doc) => {
+        items.push(doc.data());
+      });
+
+      setProjects(items);
+    });
   };
 
   React.useEffect(() => {
-    onSnapshot(
-      doc(firestore, "markdown", `${auth.currentUser?.uid}`),
-      (doc) => {
-        const data = doc.data();
-        setMarkdownBody(data?.body);
-        bodyRef.current = data?.body;
-      }
-    );
-
     auth.onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
+        getProjects(user);
       } else {
         history.push("/");
       }
@@ -45,127 +48,95 @@ export const Dashboard = () => {
   }, [user, history]);
 
   return (
-    <Wrapper isPreview={isPreview}>
+    <Wrapper>
       <Navigation />
       <div className="container">
-        <div className="devlog-container">
-          <div
-            className="show-preview"
-            onClick={() => handleMarkdownSave(markdownBody)}
-          >
-            <FloppyDisk size={30} />
-          </div>
-          <div
-            className="show-preview"
-            onClick={() => setIsPreview(!isPreview)}
-          >
-            <ProjectorScreenChart size={30} />
-          </div>
-          <textarea
-            className="form-control"
-            placeholder="Type something..."
-            value={markdownBody}
-            ref={bodyRef}
-            onChange={(e) => console.log(setMarkdownBody(e.target.value))}
+        <div className="create-box">
+          <input
+            className="create-box-input"
+            type="text"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            placeholder="Create project..."
           />
-          {isPreview && (
-            <ReactMarkdown
-              children={markdownBody}
-              plugins={[remarkGfm]}
-              className="react-markdown"
-            />
-          )}
+          <div
+            className="create-box-add"
+            onClick={() => {
+              createProject(projectName);
+              setProjectName("");
+            }}
+          >
+            <Plus size={30} />
+          </div>
         </div>
-        <div className="todo-container">
-          <Todo />
+        <div className="projects">
+          {projects.map((p: any) => (
+            <ProjectCard
+              projectName={p.projectName}
+              key={p.projectId}
+              projectId={p.projectId}
+            />
+          ))}
         </div>
       </div>
     </Wrapper>
   );
 };
 
-interface IStyle {
-  isPreview: boolean;
-}
-
-const Wrapper = styled.div<IStyle>`
+const Wrapper = styled.div`
   background-color: #fff;
 
   .container {
     width: 100%;
     height: 100%;
 
-    display: grid;
-    grid-template-columns: repeat(11, 1fr);
-    grid-template-rows: auto;
-    column-gap: 20px;
+    display: flex;
+    flex-direction: column;
 
     transition: all 1.2s ease;
 
-    .devlog-container {
-      grid-column-start: 1;
-      grid-column-end: 9;
-      padding: 0 20px;
-      height: 100%;
+    .create-box {
+      display: flex;
 
-      margin-top: 20px;
+      justify-content: center;
+      align-items: center;
 
-      display: grid;
-      grid-template-columns: repeat(8, 1fr);
-      grid-auto-flow: row;
+      margin: 30px 0 0 0;
 
-      align-content: flex-end;
+      .create-box-input {
+        width: 300px;
+        height: 30px;
+        padding: 10px 20px;
 
-      transition: all 1.2s ease;
+        color: #000;
 
-      .show-preview {
-        margin: 0 0 10px 0;
-        height: 40px;
-        width: 40px;
-        padding: 0 10px 0 10px;
-        border: 2px solid #000;
-        border-radius: 8px;
         box-shadow: 4px 4px 0 0 #000;
+        border-radius: 8px;
+
+        margin: 0 20px 0 0;
+      }
+
+      .create-box-add {
+        width: 50px;
+        height: 50px;
+        box-shadow: 4px 4px 0 0 #000;
+        border-radius: 8px;
+        border: 2px solid #000;
+
+        cursor: pointer;
 
         display: flex;
         justify-content: center;
         align-items: center;
-
-        transition: all 0.2s ease;
-
-        cursor: pointer;
-
-        :hover {
-          box-shadow: 3px 3px 0 0 #000;
-        }
-      }
-
-      .react-markdown {
-        width: 100%;
-        height: 100%;
-        grid-column-start: ${(props) => (props.isPreview ? 5 : 0)};
-        grid-column-end: ${(props) => (props.isPreview ? 9 : 0)};
-        word-wrap: break-word;
-        padding: 0 10px;
-      }
-
-      .form-control {
-        height: 800px;
-
-        grid-column-start: 1;
-        grid-column-end: ${(props) => (props.isPreview ? 5 : 9)};
-        border: 2px solid #000;
-        resize: none;
-        font-family: Inconsolata;
-        font-weight: 600;
       }
     }
 
-    .todo-container {
-      grid-column-start: 9;
-      grid-column-end: 12;
+    .projects {
+      margin: 50px 0 0 0;
+      width: 100%;
       height: 100%;
-      margin: 30px 20px 0 0;
+      display: flex;
+      flex-direction: column;
     }
   }
 `;
