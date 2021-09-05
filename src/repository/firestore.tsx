@@ -1,29 +1,18 @@
-import {
-  doc,
-  setDoc,
-  getDoc,
-  FirestoreError,
-  DocumentData,
-  onSnapshot,
-} from "firebase/firestore";
+import { doc, setDoc, FirestoreError } from "firebase/firestore";
 import { auth, firestore } from "../utils/firebase";
 import { v4 as uuid } from "uuid";
 
-const user = auth.currentUser;
-
-export const storeMarkdownData = async (markdown: any) => {
+export const storeMarkdownData = async (markdown: any, projectId: string) => {
   try {
     // Verify if there's a logged in user
     await auth.onAuthStateChanged(async (user) => {
       // if there a user, go ahead and store my markdown text
       if (user) {
-        await setDoc(
-          doc(firestore, "markdown", `${user.uid}`),
-          {
-            body: markdown,
-          },
-          { merge: true }
-        );
+        await setDoc(doc(firestore, "markdown", `${projectId}`), {
+          projectId: projectId,
+          userId: user.uid,
+          body: markdown,
+        });
       } else {
       }
     });

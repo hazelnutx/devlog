@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { doc, onSnapshot } from "@firebase/firestore";
+import { onSnapshot, query, collection, where } from "@firebase/firestore";
 import { FloppyDisk, ProjectorScreenChart } from "phosphor-react";
 import React, { useRef } from "react";
 import ReactMarkdown from "react-markdown";
@@ -18,24 +18,36 @@ const ProjectPage = (props: RouteComponentProps<Props>) => {
   const bodyRef = useRef<any>();
   const history = useHistory();
 
+  const projectId = props.match.params.id;
+
   const [user, setUser] = React.useState<any>();
   const [isPreview, setIsPreview] = React.useState<boolean>(false);
   const [markdownBody, setMarkdownBody] = React.useState("");
 
-  const handleMarkdownSave = async (markdown: string) => {
-    await storeMarkdownData(markdown);
+  const handleMarkdownSave = async (markdown: string, projectId: string) => {
+    await storeMarkdownData(markdown, projectId);
+  };
+
+  const retrieveMarkdownData = (projectId: string) => {
+    const q = query(
+      collection(firestore, "markdown"),
+      where("projectId", "==", projectId)
+    );
+
+    onSnapshot(q, (snapshot) => {
+      let markdownData: any;
+
+      snapshot.forEach((doc) => {
+        markdownData = doc.data();
+      });
+
+      setMarkdownBody(markdownData?.body);
+      bodyRef.current = markdownData?.body;
+    });
   };
 
   React.useEffect(() => {
-    console.log(props.match.params.id);
-    onSnapshot(
-      doc(firestore, "markdown", `${auth.currentUser?.uid}`),
-      (doc) => {
-        const data = doc.data();
-        setMarkdownBody(data?.body);
-        bodyRef.current = data?.body;
-      }
-    );
+    retrieveMarkdownData(projectId);
 
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -44,7 +56,7 @@ const ProjectPage = (props: RouteComponentProps<Props>) => {
         history.push("/");
       }
     });
-  }, [user, history]);
+  }, [user, history, projectId]);
 
   return (
     <Wrapper isPreview={isPreview}>
@@ -53,7 +65,7 @@ const ProjectPage = (props: RouteComponentProps<Props>) => {
         <div className="devlog-container">
           <div
             className="show-preview"
-            onClick={() => handleMarkdownSave(markdownBody)}
+            onClick={() => handleMarkdownSave(markdownBody, projectId)}
           >
             <FloppyDisk size={30} />
           </div>
