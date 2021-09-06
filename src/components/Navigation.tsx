@@ -27,7 +27,7 @@ export const Navigation = () => {
             <button
               className="button"
               type="submit"
-              onClick={logOut}
+              onClick={() => {}}
               style={{ marginRight: 20 }}
             >
               {/* TODO: Automated avatars from dicebear avatars */}

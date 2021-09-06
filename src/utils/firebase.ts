@@ -29,8 +29,6 @@ firebase.initializeApp({
       : process.env.REACT_APP_FIREBASE_APP_ID,
 });
 
-console.log(process.env.NODE_ENV);
-
 const firestore = getFirestore();
 const auth = getAuth();
 
